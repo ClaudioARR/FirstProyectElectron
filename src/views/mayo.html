@@ -30,7 +30,7 @@
             </div>
             <div class="col-4 p-2">
                 <div class="form-group">
-                    <input type="text" id="date" class="form-control" placeholder="Fecha">
+                    <input type="text" id="date" class="form-control" placeholder="Fecha (Opcional)">
                 </div>
             </div>
         </div>
@@ -57,10 +57,10 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td><button class="btn btn-outline-danger">OBTENER TOTAL</button></td>
+                            <td><button class="btn btn-outline-danger" onclick="getTotalPrice();">OBTENER TOTAL</button></td>
                             <td></td>
                             <td></td>
-                            <td><label>aca van los gastos</label></td>
+                            <td id="total"></td>
                         </tr>
                     </tfoot>
                 </table>

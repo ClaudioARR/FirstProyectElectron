@@ -46,28 +46,54 @@ function createWindow(month) {
 function getValues(month) {
     const name = document.querySelector('#name').value;
     const price = document.querySelector('#price').value;
-    const date = document.querySelector('#date').value;
+    var date;
+
+    if(document.querySelector('#date').value == ''){
+        var f = new Date();
+        date = f.getDate() + '/' + (f.getMonth() + 1).toString() + '/' + f.getFullYear();
+    }else{
+        date = document.querySelector('#date').value;
+    }
 
     const idRow = name + month;
     
 
     const gasto = `
         <tr class="table-danger" id="${idRow}">
-        <td>${name}</td>
-        <td id="itemPrice">${price}</td>
+        <td><strong>${name.toUpperCase()}</strong></td>
+        <td name="itemPrice">${price}</td>
         <td>${date}</td>
         <td><button class="btn btn-danger" onclick="removeItem('${idRow}');">Eliminar</button></td>
         </tr>
         `;
 
     document.getElementById('input').innerHTML += gasto;
+    
+    document.querySelector('#name').value = '';
+    document.querySelector('#price').value = '';
+    document.querySelector('#date').value = '';
 }
 
 function removeItem(itemID){
     document.getElementById(itemID).remove();
 }
 
+function getTotalPrice(){
+    var cont = 0;
+    var prices = Array();
 
+    prices = document.getElementsByName('itemPrice');
+
+    prices.forEach(i => {
+        cont = cont + parseInt(i.innerHTML);
+    });    
+
+    document.getElementById('total').innerHTML  = '';
+    
+    const total = `<label><h4 class="text-danger"><strong>$  ${cont}   </strong></h4></label>`;
+
+    document.getElementById('total').innerHTML += total;
+}
 
 
 const templateMenu = [
