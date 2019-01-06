@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Gastos Julio</title>
+    <link rel="stylesheet" href="https://bootswatch.com/4/sandstone/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/index.css">
+    <script src="../index.js"></script>
+</head>
+
+<body>
+        <script>
+                const thisMonth = 'julio';
+            </script>
+    <div class="container">
+
+        <div class="row">
+            <div class="col-4 p-2">
+                <div class="form-group">
+                    <input type="text" id="name" class="form-control" placeholder="Gasto" autofocus>
+                </div>
+            </div>
+            <div class="col-4 p-2">
+                <div class="form-group">
+                    <input type="text" id="price" class="form-control" placeholder="Precio">
+                </div>
+            </div>
+            <div class="col-4 p-2">
+                <div class="form-group">
+                    <input type="text" id="date" class="form-control" placeholder="Fecha">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4 p-2">
+                <button class="btn btn-primary btn-block" onclick="getValues(thisMonth);">Agregar Gasto</button>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-12 p-4">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Gasto</th>
+                            <th>Precio</th>
+                            <th>Fecha</th>
+                            <th>XXXXXXXX</th>
+                        </tr>
+                    </thead>
+                    <tbody id="input">
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td><button class="btn btn-outline-danger">OBTENER TOTAL</button></td>
+                            <td></td>
+                            <td></td>
+                            <td><label>aca van los gastos</label></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    
+
+
+</body>
+
+</html>
