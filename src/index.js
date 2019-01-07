@@ -3,6 +3,10 @@ const { app, BrowserWindow, Menu } = require('electron');
 const url = require('url');
 const path = require('path');
 
+const MongoClient = require('mongodb').MongoClient;
+const urlm = "mongodb://localhost:27017/";
+
+
 if (process.env.NODE_ENV !== 'production') {
 
     require('electron-reload')(__dirname, {
@@ -11,7 +15,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 let mainWindow
-let eneroWindow
+
 
 app.on('ready', () => {
     mainWindow = new BrowserWindow({});
@@ -48,37 +52,40 @@ function getValues(month) {
     const price = document.querySelector('#price').value;
     var date;
 
-    if(document.querySelector('#date').value == ''){
+    if (document.querySelector('#date').value == '') {
         var f = new Date();
         date = f.getDate() + '/' + (f.getMonth() + 1).toString() + '/' + f.getFullYear();
-    }else{
+    } else {
         date = document.querySelector('#date').value;
     }
 
     const idRow = name + month;
-    
+
 
     const gasto = `
         <tr class="table-danger" id="${idRow}">
-        <td><strong>${name.toUpperCase()}</strong></td>
+        <td><strong name="gasto">${name.toUpperCase()}</strong></td>
         <td name="itemPrice">${price}</td>
-        <td>${date}</td>
+        <td name="fecha">${date}</td>
         <td><button class="btn btn-danger" onclick="removeItem('${idRow}');">Eliminar</button></td>
         </tr>
         `;
 
     document.getElementById('input').innerHTML += gasto;
     
+
+    insertMongo(name, price, date);
+
     document.querySelector('#name').value = '';
     document.querySelector('#price').value = '';
     document.querySelector('#date').value = '';
 }
 
-function removeItem(itemID){
+function removeItem(itemID) {
     document.getElementById(itemID).remove();
 }
 
-function getTotalPrice(){
+function getTotalPrice() {
     var cont = 0;
     var prices = Array();
 
@@ -86,14 +93,39 @@ function getTotalPrice(){
 
     prices.forEach(i => {
         cont = cont + parseInt(i.innerHTML);
-    });    
+    });
 
-    document.getElementById('total').innerHTML  = '';
-    
+    document.getElementById('total').innerHTML = '';
+
     const total = `<label><h4 class="text-danger"><strong>$  ${cont}   </strong></h4></label>`;
 
     document.getElementById('total').innerHTML += total;
 }
+
+
+
+function insertMongo(name, price, date) {
+    var producto = {
+        nombre: "",
+        precio: "",
+        fecha: ""
+    };
+    
+    producto.nombre = name;
+    producto.precio = price;
+    producto.fecha = date;
+
+    MongoClient.connect(urlm, true, function (err, db) {
+        if (err) throw err;
+        var dbo = db.db("electron");
+        dbo.collection("products").insertOne(producto, function (err, res) {
+            if (err) throw err;
+            console.log("1 document inserted");
+            db.close();
+        });
+    });
+}
+
 
 
 const templateMenu = [
@@ -126,17 +158,3 @@ const templateMenu = [
     }
 ];
 
-const templatewinMenu = [
-    {
-        label: 'File',
-        submenu: [
-            {
-                label: 'Add',
-                accelerator: 'Ctrl + N',
-                click() {
-
-                }
-            }
-        ]
-    }
-];
