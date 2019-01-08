@@ -67,21 +67,37 @@ function getValues(month) {
         <td><strong name="gasto">${name.toUpperCase()}</strong></td>
         <td name="itemPrice">${price}</td>
         <td name="fecha">${date}</td>
-        <td><button class="btn btn-danger" onclick="removeItem('${idRow}');">Eliminar</button></td>
+        <td><button class="btn btn-danger" onclick="removeItem('${idRow}', '${month}');">Eliminar</button></td>
         </tr>
         `;
 
     document.getElementById('input').innerHTML += gasto;
-    
 
-    insertMongo(name, price, date);
+
+    insertMongo(month, name, price, date);
 
     document.querySelector('#name').value = '';
     document.querySelector('#price').value = '';
     document.querySelector('#date').value = '';
 }
 
-function removeItem(itemID) {
+function removeItem(itemID, month) {
+    producto = new Array();
+    nombreA = new Array();
+    precioA = new Array();
+    fechaA = new Array();    
+    
+    producto = document.getElementById(itemID).innerHTML.split('>');
+    nombreA = producto[2].split('<');
+    precioA = producto[5].split('<');
+    fechaA = producto[7].split('<');
+
+    var nombre = nombreA[0];
+    var precio = precioA[0];
+    var fecha = fechaA[0];
+
+    removeMongo(month, nombre, precio, fecha);
+
     document.getElementById(itemID).remove();
 }
 
@@ -104,13 +120,15 @@ function getTotalPrice() {
 
 
 
-function insertMongo(name, price, date) {
+function insertMongo(month, name, price, date) {
     var producto = {
+        mes: "",
         nombre: "",
         precio: "",
         fecha: ""
     };
-    
+
+    producto.mes = month;
     producto.nombre = name;
     producto.precio = price;
     producto.fecha = date;
@@ -121,6 +139,32 @@ function insertMongo(name, price, date) {
         dbo.collection("products").insertOne(producto, function (err, res) {
             if (err) throw err;
             console.log("1 document inserted");
+            db.close();
+        });
+    });
+}
+
+
+function removeMongo(month, name, price, date) {
+    var producto = {
+        mes: "",
+        nombre: "",
+        precio: "",
+        fecha: ""
+    };
+
+    producto.mes = month;
+    producto.nombre = name.toLowerCase();
+    producto.precio = price;
+    producto.fecha = date;
+
+
+    MongoClient.connect(urlm, function (err, db) {
+        if (err) throw err;
+        var dbo = db.db("electron");
+        dbo.collection("products").deleteOne(producto, function (err, obj) {
+            if (err) throw err;
+            console.log("1 document deleted");
             db.close();
         });
     });
