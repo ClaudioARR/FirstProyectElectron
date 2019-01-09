@@ -74,7 +74,7 @@ function getValues(month) {
     document.getElementById('input').innerHTML += gasto;
 
 
-    insertMongo(month, name, price, date);
+    insertMongo(idRow, month, name, price, date);
 
     document.querySelector('#name').value = '';
     document.querySelector('#price').value = '';
@@ -85,8 +85,8 @@ function removeItem(itemID, month) {
     producto = new Array();
     nombreA = new Array();
     precioA = new Array();
-    fechaA = new Array();    
-    
+    fechaA = new Array();
+
     producto = document.getElementById(itemID).innerHTML.split('>');
     nombreA = producto[2].split('<');
     precioA = producto[5].split('<');
@@ -120,14 +120,16 @@ function getTotalPrice() {
 
 
 
-function insertMongo(month, name, price, date) {
+function insertMongo(idrow, month, name, price, date) {
     var producto = {
+        idrow: "",
         mes: "",
         nombre: "",
         precio: "",
         fecha: ""
     };
 
+    producto.idrow = idrow;
     producto.mes = month;
     producto.nombre = name;
     producto.precio = price;
@@ -168,6 +170,37 @@ function removeMongo(month, name, price, date) {
             db.close();
         });
     });
+}
+
+function allMongo(month) {
+    var producto = {
+        mes: ""
+    };
+
+    producto.mes = month;    
+
+    MongoClient.connect(urlm, function (err, db) {
+        if (err) throw err;
+        var dbo = db.db("electron");
+        dbo.collection("products").find(producto, { projection: { _id: 0 } }).toArray(function (err, result) {
+            if (err) throw err;
+            result.forEach(i => {
+                console.log(i.idrow);
+                const gasto = `
+                <tr class="table-danger" id="${i.idrow}">
+                <td><strong name="gasto">${i.nombre.toUpperCase()}</strong></td>
+                <td name="itemPrice">${i.precio}</td>
+                <td name="fecha">${i.fecha}</td>
+                <td><button class="btn btn-danger" onclick="removeItem('${i.idrow}', '${month}');">Eliminar</button></td>
+                </tr>
+                `;
+
+                document.getElementById('input').innerHTML += gasto;
+            });
+            db.close();
+        });
+    });
+
 }
 
 
