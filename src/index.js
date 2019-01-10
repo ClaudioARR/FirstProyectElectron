@@ -7,13 +7,6 @@ const MongoClient = require('mongodb').MongoClient;
 const urlm = "mongodb://localhost:27017/";
 
 
-if (process.env.NODE_ENV !== 'production') {
-
-    require('electron-reload')(__dirname, {
-        electron: path.join(__dirname, '../node_modules', '.bin', 'electron')
-    });
-}
-
 let mainWindow
 
 
@@ -44,7 +37,21 @@ function createWindow(month) {
         slashes: true
     }));
 
-    win.setMenu(null);
+    //win.setMenu(null);
+}
+
+function createWindowALL() {
+    const remote = require('electron').remote;
+    const BrowserWindow = remote.BrowserWindow;
+
+    var win = new BrowserWindow({});
+    win.loadURL(url.format({
+        pathname: path.join(__dirname, 'allproducts.html'),
+        protocol: 'file',
+        slashes: true
+    }));
+
+    //win.setMenu(null);
 }
 
 function getValues(month) {
@@ -119,6 +126,19 @@ function getTotalPrice() {
 }
 
 
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+
+//////////// FUNCIONES MONGO
 
 function insertMongo(idrow, month, name, price, date) {
     var producto = {
@@ -203,15 +223,52 @@ function allMongo(month) {
 
 }
 
+function fullMongo() {
+    MongoClient.connect(urlm, function (err, db) {
+        if (err) throw err;
+        var dbo = db.db("electron");
+        dbo.collection("products").find({}, { projection: { _id: 0 } }).toArray(function (err, result) {
+            if (err) throw err;
+            result.forEach(i => {
+                console.log(i.idrow);
+                const gasto = `
+                <tr class="table-danger" id="${i.idrow}">
+                <td><strong name="gasto">${i.nombre.toUpperCase()}</strong></td>
+                <td name="itemPrice">${i.precio}</td>
+                <td name="fecha">${i.fecha}</td>
+                <td>${i.mes}</td>
+                </tr>
+                `;
 
+                document.getElementById('input').innerHTML += gasto;
+            });
+            db.close();
+        });
+    });
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+
+//////////// MENU
 
 const templateMenu = [
     {
         label: 'File',
         submenu: [
-            {
-                label: 'Ver Todos'
-            },
             {
                 label: 'Quit',
                 accelerator: 'Ctrl + Q',
