@@ -54,7 +54,7 @@ function createWindowALL() {
     //win.setMenu(null);
 }
 
-function getValues(month) {
+function getValuesI(month) {
     const name = document.querySelector('#name').value;
     const price = document.querySelector('#price').value;
     var date;
@@ -70,7 +70,7 @@ function getValues(month) {
 
 
     const gasto = `
-        <tr class="table-danger" id="${idRow}">
+        <tr class="table-success" id="${idRow}">
         <td><strong name="gasto">${name.toUpperCase()}</strong></td>
         <td name="itemPrice">${price}</td>
         <td name="fecha">${date}</td>
@@ -87,6 +87,42 @@ function getValues(month) {
     document.querySelector('#price').value = '';
     document.querySelector('#date').value = '';
 }
+
+function getValuesG(month) {
+    const name = document.querySelector('#name').value;
+    const price = document.querySelector('#price').value;
+    var date;
+
+    if (document.querySelector('#date').value == '') {
+        var f = new Date();
+        date = f.getDate() + '/' + (f.getMonth() + 1).toString() + '/' + f.getFullYear();
+    } else {
+        date = document.querySelector('#date').value;
+    }
+
+    const idRow = name + month;
+
+    var pricetd = '-' + price;
+
+    const gasto = `
+        <tr class="table-danger" id="${idRow}">
+        <td><strong name="gasto">${name.toUpperCase()}</strong></td>
+        <td name="itemPrice">${pricetd}</td>
+        <td name="fecha">${date}</td>
+        <td><button class="btn btn-danger" onclick="removeItem('${idRow}', '${month}');">Eliminar</button></td>
+        </tr>
+        `;
+
+    document.getElementById('input').innerHTML += gasto;
+
+
+    insertMongo(idRow, month, name, pricetd, date);
+
+    document.querySelector('#name').value = '';
+    document.querySelector('#price').value = '';
+    document.querySelector('#date').value = '';
+}
+
 
 function removeItem(itemID, month) {
     producto = new Array();
@@ -118,9 +154,9 @@ function getTotalPrice() {
         cont = cont + parseInt(i.innerHTML);
     });
 
-    document.getElementById('total').innerHTML = '';
+    document.getElementById('total').innerHTML = '';    
 
-    const total = `<label><h4 class="text-danger"><strong>$  ${cont}   </strong></h4></label>`;
+    const total = `<label><h4 class="text-primary"><strong>$  ${cont}   </strong></h4></label>`;
 
     document.getElementById('total').innerHTML += total;
 }
@@ -197,7 +233,7 @@ function allMongo(month) {
         mes: ""
     };
 
-    producto.mes = month;    
+    producto.mes = month;
 
     MongoClient.connect(urlm, function (err, db) {
         if (err) throw err;
@@ -205,8 +241,8 @@ function allMongo(month) {
         dbo.collection("products").find(producto, { projection: { _id: 0 } }).toArray(function (err, result) {
             if (err) throw err;
             result.forEach(i => {
-                console.log(i.idrow);
-                const gasto = `
+                if (i.precio < 0) {
+                    const gasto = `
                 <tr class="table-danger" id="${i.idrow}">
                 <td><strong name="gasto">${i.nombre.toUpperCase()}</strong></td>
                 <td name="itemPrice">${i.precio}</td>
@@ -215,7 +251,20 @@ function allMongo(month) {
                 </tr>
                 `;
 
-                document.getElementById('input').innerHTML += gasto;
+                    document.getElementById('input').innerHTML += gasto;
+                } else {
+                    const ingreso = `
+                <tr class="table-success" id="${i.idrow}">
+                <td><strong name="gasto">${i.nombre.toUpperCase()}</strong></td>
+                <td name="itemPrice">${i.precio}</td>
+                <td name="fecha">${i.fecha}</td>
+                <td><button class="btn btn-danger" onclick="removeItem('${i.idrow}', '${month}');">Eliminar</button></td>
+                </tr>
+                `;
+
+                    document.getElementById('input').innerHTML += ingreso;
+                }
+
             });
             db.close();
         });
@@ -230,8 +279,8 @@ function fullMongo() {
         dbo.collection("products").find({}, { projection: { _id: 0 } }).toArray(function (err, result) {
             if (err) throw err;
             result.forEach(i => {
-                console.log(i.idrow);
-                const gasto = `
+                if (i.precio < 0) {
+                    const gasto = `
                 <tr class="table-danger" id="${i.idrow}">
                 <td><strong name="gasto">${i.nombre.toUpperCase()}</strong></td>
                 <td name="itemPrice">${i.precio}</td>
@@ -240,7 +289,20 @@ function fullMongo() {
                 </tr>
                 `;
 
-                document.getElementById('input').innerHTML += gasto;
+                    document.getElementById('input').innerHTML += gasto;
+                } else {
+                    const ingreso = `
+                <tr class="table-success" id="${i.idrow}">
+                <td><strong name="gasto">${i.nombre.toUpperCase()}</strong></td>
+                <td name="itemPrice">${i.precio}</td>
+                <td name="fecha">${i.fecha}</td>
+                <td>${i.mes}</td>
+                </tr>
+                `;
+
+                    document.getElementById('input').innerHTML += ingreso;
+                }
+
             });
             db.close();
         });

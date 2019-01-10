@@ -22,7 +22,7 @@
         <div class="row">
             <div class="col-4 p-2">
                 <div class="form-group">
-                    <input type="text" id="name" class="form-control" placeholder="Gasto" autofocus>
+                    <input type="text" id="name" class="form-control" placeholder="Ingreso/Gasto" autofocus>
                 </div>
             </div>
             <div class="col-4 p-2">
@@ -38,7 +38,11 @@
         </div>
         <div class="row">
             <div class="col-4 p-2">
-                <button class="btn btn-primary btn-block" onclick="getValues(thisMonth); getTotalPrice();">Agregar
+                <button class="btn btn-primary btn-block" onclick="getValuesI(thisMonth);">Agregar
+                    Ingreso</button>
+            </div>
+            <div class="col-4 p-2">
+                <button class="btn btn-primary btn-block" onclick="getValuesG(thisMonth);">Agregar
                     Gasto</button>
             </div>
         </div>
@@ -59,8 +63,8 @@
 
                     </tbody>
                     <tfoot>
-                        <tr>
-                            <td><button class="btn btn-outline-danger" onclick="getTotalPrice();">OBTENER TOTAL</button></td>
+                        <tr class="table-secondary">
+                            <td><strong>TOTAL:</strong></td>
                             <td></td>
                             <td></td>
                             <td id="total"></td>
