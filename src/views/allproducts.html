@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Informe Anual</title>
+    <link rel="stylesheet" href="https://bootswatch.com/4/sandstone/bootstrap.min.css">
+    <script src="../index.js"></script>
+
+</head>
+
+<body>
+    <div class="row">
+        <div class="col-12 p-4">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Gasto</th>
+                        <th>Precio</th>
+                        <th>Fecha</th>
+                        <th>XXXXXXXX</th>
+                    </tr>
+                </thead>
+                <tbody id="input">
+
+                </tbody>
+                <tfoot>
+                    <tr class="table-secondary">
+                        <td><strong>TOTAL:</strong></td>
+                        <td></td>                        
+                        <td></td>
+                        <td id="total"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+    </div>
+    </div>
+
+
+    <script>
+        (fullMongo());
+        (setInterval(function () { getTotalPrice(); }, 600));
+    </script>
+
+</body>
+
+</html>
