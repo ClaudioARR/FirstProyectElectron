@@ -3,8 +3,8 @@ const { app, BrowserWindow, Menu } = require('electron');
 const url = require('url');
 const path = require('path');
 
-const MongoClient = require('mongodb').MongoClient;
-const urlm = "mongodb://localhost:27017/";
+const Datastore = require('nedb');
+const db = new Datastore({ filename: './products', autoload: true });
 
 
 let mainWindow
@@ -18,12 +18,14 @@ app.on('ready', () => {
         slashes: true
     }));
 
-    const mainMenu = Menu.buildFromTemplate(templateMenu);
-    Menu.setApplicationMenu(mainMenu);
+    //const mainMenu = Menu.buildFromTemplate(templateMenu);
+    //Menu.setApplicationMenu(mainMenu);
 
     mainWindow.on('close', () => {
         app.quit();
     });
+
+    mainWindow.setMenu(null);
 });
 
 function createWindow(month) {
@@ -37,7 +39,7 @@ function createWindow(month) {
         slashes: true
     }));
 
-    //win.setMenu(null);
+    win.setMenu(null);
 }
 
 function createWindowALL() {
@@ -51,7 +53,7 @@ function createWindowALL() {
         slashes: true
     }));
 
-    //win.setMenu(null);
+    win.setMenu(null);
 }
 
 function getValuesI(month) {
@@ -81,7 +83,7 @@ function getValuesI(month) {
     document.getElementById('input').innerHTML += gasto;
 
 
-    insertMongo(idRow, month, name, price, date);
+    insertNeDB(idRow, month, name, price, date);
 
     document.querySelector('#name').value = '';
     document.querySelector('#price').value = '';
@@ -116,7 +118,7 @@ function getValuesG(month) {
     document.getElementById('input').innerHTML += gasto;
 
 
-    insertMongo(idRow, month, name, pricetd, date);
+    insertNeDB(idRow, month, name, pricetd, date);
 
     document.querySelector('#name').value = '';
     document.querySelector('#price').value = '';
@@ -139,7 +141,7 @@ function removeItem(itemID, month) {
     var precio = precioA[0];
     var fecha = fechaA[0];
 
-    removeMongo(month, nombre, precio, fecha);
+    removeNeDB(month, nombre, precio, fecha);
 
     document.getElementById(itemID).remove();
 }
@@ -154,7 +156,7 @@ function getTotalPrice() {
         cont = cont + parseInt(i.innerHTML);
     });
 
-    document.getElementById('total').innerHTML = '';    
+    document.getElementById('total').innerHTML = '';
 
     const total = `<label><h4 class="text-primary"><strong>$  ${cont}   </strong></h4></label>`;
 
@@ -174,9 +176,9 @@ function getTotalPrice() {
 /////////////////////////////////////////////////////////////////////////////////////
 
 
-//////////// FUNCIONES MONGO
+//////////// FUNCIONES NeDB
 
-function insertMongo(idrow, month, name, price, date) {
+function insertNeDB(idrow, month, name, price, date) {
     var producto = {
         idrow: "",
         mes: "",
@@ -191,19 +193,17 @@ function insertMongo(idrow, month, name, price, date) {
     producto.precio = price;
     producto.fecha = date;
 
-    MongoClient.connect(urlm, true, function (err, db) {
-        if (err) throw err;
-        var dbo = db.db("electron");
-        dbo.collection("products").insertOne(producto, function (err, res) {
-            if (err) throw err;
-            console.log("1 document inserted");
-            db.close();
-        });
+    db.insert(producto, function (err, newDoc) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log(newDoc);
+        }
     });
 }
 
 
-function removeMongo(month, name, price, date) {
+function removeNeDB(month, name, price, date) {
     var producto = {
         mes: "",
         nombre: "",
@@ -217,30 +217,27 @@ function removeMongo(month, name, price, date) {
     producto.fecha = date;
 
 
-    MongoClient.connect(urlm, function (err, db) {
-        if (err) throw err;
-        var dbo = db.db("electron");
-        dbo.collection("products").deleteOne(producto, function (err, obj) {
-            if (err) throw err;
-            console.log("1 document deleted");
-            db.close();
-        });
+    db.remove(producto, function (err, newDoc) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log(newDoc);
+        }
     });
 }
 
-function allMongo(month) {
+function allNeDB(month) {
     var producto = {
         mes: ""
     };
 
     producto.mes = month;
 
-    MongoClient.connect(urlm, function (err, db) {
-        if (err) throw err;
-        var dbo = db.db("electron");
-        dbo.collection("products").find(producto, { projection: { _id: 0 } }).toArray(function (err, result) {
-            if (err) throw err;
-            result.forEach(i => {
+    db.find(producto, function (err, newDoc) {
+        if (err) {
+            console.log(err);
+        } else {
+            newDoc.forEach(i => {
                 if (i.precio < 0) {
                     const gasto = `
                 <tr class="table-danger" id="${i.idrow}">
@@ -264,21 +261,18 @@ function allMongo(month) {
 
                     document.getElementById('input').innerHTML += ingreso;
                 }
-
             });
-            db.close();
-        });
+        }
     });
 
 }
 
-function fullMongo() {
-    MongoClient.connect(urlm, function (err, db) {
-        if (err) throw err;
-        var dbo = db.db("electron");
-        dbo.collection("products").find({}, { projection: { _id: 0 } }).toArray(function (err, result) {
-            if (err) throw err;
-            result.forEach(i => {
+function fullNeDB() {
+    db.find({}, { projection: { _id: 0 } }, function (err, newDoc) {
+        if (err) {
+            console.log(err);
+        } else {
+            newDoc.forEach(i => {
                 if (i.precio < 0) {
                     const gasto = `
                 <tr class="table-danger" id="${i.idrow}">
@@ -304,8 +298,7 @@ function fullMongo() {
                 }
 
             });
-            db.close();
-        });
+        }
     });
 
 }
@@ -327,6 +320,7 @@ function fullMongo() {
 
 //////////// MENU
 
+/*
 const templateMenu = [
     {
         label: 'File',
@@ -353,4 +347,4 @@ const templateMenu = [
         ]
     }
 ];
-
+*/
